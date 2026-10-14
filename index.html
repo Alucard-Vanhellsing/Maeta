@@ -1,0 +1,325 @@
+<!doctype html><html><head><meta charset=utf8><meta name=viewport content="width=device-width,initial-scale=1,viewport-fit=cover"><style>:root{color-scheme:light;box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}html{scroll-padding-top:env(safe-area-inset-top,0px)}body{margin:0;padding:0;font:14px -apple-system,BlinkMacSystemFont,sans-serif;background:#fff;color:#000}img{max-width:100%}[hidden]:not([hidden=until-found i]){display:none!important}</style></head><body>
+<title>La mejor maestra del mundo</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Gochi+Hand&display=swap">
+<style>
+  /* Concepto: hoja de cuaderno rayado sobre un escritorio; el dibujo de crayón ocupa toda la hoja. */
+  :root {
+    --desk: #cfc7b4;
+    --paper: #fdfbf3;
+    --rule: #bcd4ea;
+    --margin: #e8a0a0;
+    --ink: #2b2a33;
+    --chalk: #f4f1e8;
+    --red: #e53935;
+    --red-dark: #b71c1c;
+    --orange: #f57c00;
+    --yellow: #fdd835;
+    --gold: #f9c22e;
+    --green: #43a047;
+    --green-dark: #2e7d32;
+    --board: #2f6f4a;
+    --blue: #2f86d6;
+    --sky: #8ec5f2;
+    --purple: #8e44ad;
+    --pink: #f48fb1;
+    --wood: #8d5a3b;
+    --hair: #6b3f2a;
+    --skin: #ffd2a8;
+    --font-hand: 'Gochi Hand', 'Comic Sans MS', 'Chalkboard SE', cursive;
+  }
+  body {
+    background: var(--desk);
+    color: var(--ink);
+    padding-block: 20px;
+    padding-left: max(16px, env(safe-area-inset-left, 0px));
+    padding-right: max(16px, env(safe-area-inset-right, 0px));
+  }
+  .sheet {
+    position: relative;
+    max-width: 880px;
+    margin: 0 auto;
+    background-color: var(--paper);
+    background-image: repeating-linear-gradient(to bottom, transparent 0, transparent 31px, var(--rule) 31px, var(--rule) 32px);
+    background-position: 0 14px;
+    box-shadow: 0 2px 0 rgba(0, 0, 0, .08), 0 10px 28px rgba(60, 45, 20, .25);
+    overflow: hidden;
+  }
+  .sheet::before {
+    content: "";
+    position: absolute;
+    top: 0;
+    bottom: 0;
+    left: 6%;
+    width: 2px;
+    background: var(--margin);
+  }
+  #dibujo {
+    position: relative;
+    display: block;
+    width: 100%;
+    height: auto;
+  }
+  #art text {
+    font-family: var(--font-hand);
+  }
+</style>
+
+<main class="sheet">
+  <svg id="dibujo" viewBox="0 0 800 660" role="img" aria-label="Dibujo infantil hecho con crayones de una maestra sonriente con un pizarrón, corazones y el letrero La mejor maestra del mundo">
+    <defs>
+      <filter id="crayon" x="-3%" y="-3%" width="106%" height="106%">
+        <feTurbulence type="fractalNoise" baseFrequency="0.035" numOctaves="2" seed="3" result="warp"/>
+        <feDisplacementMap in="SourceGraphic" in2="warp" scale="5" xChannelSelector="R" yChannelSelector="G" result="wob"/>
+        <feTurbulence type="fractalNoise" baseFrequency="0.9" numOctaves="2" seed="8" result="grain"/>
+        <feColorMatrix in="grain" type="matrix" values="0 0 0 0 0  0 0 0 0 0  0 0 0 0 0  3 0 0 0 -0.55" result="holes"/>
+        <feComposite in="wob" in2="holes" operator="in"/>
+      </filter>
+    </defs>
+    <g id="art" filter="url(#crayon)"></g>
+  </svg>
+</main>
+
+<script>
+(function () {
+  var NS = 'http://www.w3.org/2000/svg';
+  var art = document.getElementById('art');
+  var cs = getComputedStyle(document.documentElement);
+  function C(n) { return cs.getPropertyValue('--' + n).trim(); }
+
+  var seed = 11;
+  function rnd() {
+    seed |= 0; seed = seed + 0x6D2B79F5 | 0;
+    var t = Math.imul(seed ^ seed >>> 15, 1 | seed);
+    t = t + Math.imul(t ^ t >>> 7, 61 | t) ^ t;
+    return ((t ^ t >>> 14) >>> 0) / 4294967296;
+  }
+  function r(a, b) { return a + rnd() * (b - a); }
+  function f(n) { return n.toFixed(1); }
+
+  function el(tag, attrs) {
+    var e = document.createElementNS(NS, tag);
+    for (var k in attrs) e.setAttribute(k, attrs[k]);
+    art.appendChild(e);
+    return e;
+  }
+  function poly(pts, attrs) {
+    var d = 'M' + pts.map(function (p) { return f(p[0]) + ' ' + f(p[1]); }).join(' L');
+    var a = { d: d, fill: 'none', 'stroke-linecap': 'round', 'stroke-linejoin': 'round' };
+    for (var k in attrs) a[k] = attrs[k];
+    return el('path', a);
+  }
+  // línea chueca: cada tramo se parte en pedazos con temblor
+  function line(pts, attrs) {
+    var out = [];
+    for (var i = 0; i < pts.length - 1; i++) {
+      var a = pts[i], b = pts[i + 1];
+      var n = Math.max(2, Math.round(Math.hypot(b[0] - a[0], b[1] - a[1]) / 25));
+      for (var k = 0; k < n; k++) {
+        var t = k / n;
+        out.push([a[0] + (b[0] - a[0]) * t + r(-1.6, 1.6), a[1] + (b[1] - a[1]) * t + r(-1.6, 1.6)]);
+      }
+    }
+    out.push(pts[pts.length - 1]);
+    return poly(out, attrs);
+  }
+  // figura cerrada que se pasa un poquito del punto de inicio
+  function shape(pts, attrs) {
+    var s = pts[0], n = pts[1];
+    return line(pts.concat([s, [s[0] + (n[0] - s[0]) * 0.12, s[1] + (n[1] - s[1]) * 0.12]]), attrs);
+  }
+  // círculo hecho a mano, no cierra perfecto
+  function circ(cx, cy, rad, attrs) {
+    var pts = [], n = 30, a0 = r(0, 6.28), over = r(0.15, 0.4), ph = r(0, 6.28);
+    for (var i = 0; i <= n; i++) {
+      var t = a0 + (i / n) * (6.283 + over);
+      var rr = rad * (1 + 0.04 * Math.sin(t * 2 + ph) + 0.05 * (i / n) + r(-0.012, 0.012));
+      pts.push([cx + rr * Math.cos(t), cy + rr * Math.sin(t)]);
+    }
+    return poly(pts, attrs);
+  }
+  // relleno con rayones de ida y vuelta, se sale un poco de la raya
+  function scribble(ext, y0, y1, step, color, sw, op) {
+    var pts = [], i = 0;
+    for (var y = y0; y <= y1; y += step) {
+      var e = ext(y);
+      if (!e) continue;
+      var left = i % 2 === 0; i++;
+      var x = left ? e[0] - r(0, 5) : e[1] + r(0, 5);
+      pts.push([x, y + r(-1.5, 1.5)]);
+    }
+    if (pts.length > 1) poly(pts, { stroke: color, 'stroke-width': sw, opacity: op || 0.92 });
+  }
+  function circExt(cx, cy, rad) {
+    return function (y) {
+      var d = rad * rad - (y - cy) * (y - cy);
+      if (d < 0) return null;
+      var dx = Math.sqrt(d);
+      return [cx - dx, cx + dx];
+    };
+  }
+  function heart(cx, cy, s, fill, stroke) {
+    var d = 'M' + cx + ' ' + (cy + s * 0.9) +
+      ' C' + (cx - s * 1.5) + ' ' + (cy - s * 0.1) + ' ' + (cx - s * 0.7) + ' ' + (cy - s * 1.1) + ' ' + cx + ' ' + (cy - s * 0.35) +
+      ' C' + (cx + s * 0.7) + ' ' + (cy - s * 1.1) + ' ' + (cx + s * 1.5) + ' ' + (cy - s * 0.1) + ' ' + cx + ' ' + (cy + s * 0.9) + 'Z';
+    el('path', { d: d, fill: fill, transform: 'translate(2 1.5)' });
+    el('path', { d: d, fill: 'none', stroke: stroke, 'stroke-width': 4, 'stroke-linejoin': 'round' });
+  }
+  function star(cx, cy, R) {
+    var pts = [], rot = r(-0.4, 0.4);
+    for (var i = 0; i < 10; i++) {
+      var rad = i % 2 ? R * 0.45 : R;
+      var a = rot - Math.PI / 2 + i * Math.PI / 5;
+      pts.push([cx + rad * Math.cos(a), cy + rad * Math.sin(a)]);
+    }
+    el('path', { d: 'M' + pts.map(function (p) { return f(p[0]) + ' ' + f(p[1]); }).join(' L') + 'Z', fill: C('yellow'), stroke: C('orange'), 'stroke-width': 3, 'stroke-linejoin': 'round' });
+  }
+  function flower(x, yTop, color) {
+    line([[x, yTop + 10], [x + r(-5, 5), 650]], { stroke: C('green-dark'), 'stroke-width': 4 });
+    for (var i = 0; i < 5; i++) {
+      var a = i * 1.2566 + r(0, 0.5);
+      circ(x + 12 * Math.cos(a), yTop + 12 * Math.sin(a), 8, { stroke: color, 'stroke-width': 4 });
+    }
+    el('circle', { cx: x, cy: yTop, r: 7, fill: C('yellow') });
+    circ(x, yTop, 7, { stroke: C('orange'), 'stroke-width': 3 });
+  }
+
+  var ink = C('ink');
+
+  /* pasto */
+  scribble(function () { return [-8, 808]; }, 564, 652, 7, C('green'), 8);
+  var blades = [];
+  for (var x = -5; x <= 805; x += 13) { blades.push([x, 562]); blades.push([x + 6, r(540, 552)]); }
+  poly(blades, { stroke: C('green-dark'), 'stroke-width': 4 });
+
+  /* nube */
+  scribble(function () { return [50, 152]; }, 208, 248, 6, C('sky'), 6, 0.8);
+  el('path', { d: 'M40 250 Q28 226 58 222 Q68 200 98 210 Q124 194 140 220 Q168 226 156 250 Z', fill: 'none', stroke: C('blue'), 'stroke-width': 4, 'stroke-linejoin': 'round' });
+
+  /* sol con cara */
+  el('circle', { cx: 742, cy: 62, r: 24, fill: C('yellow') });
+  circ(742, 62, 24, { stroke: C('orange'), 'stroke-width': 4 });
+  for (var k = 0; k < 12; k++) {
+    var an = k * 0.5236 + r(-0.08, 0.08), r0 = 31, r1 = 31 + r(10, 20);
+    line([[742 + r0 * Math.cos(an), 62 + r0 * Math.sin(an)], [742 + r1 * Math.cos(an), 62 + r1 * Math.sin(an)]], { stroke: C('orange'), 'stroke-width': 4 });
+  }
+  el('circle', { cx: 735, cy: 57, r: 2.4, fill: ink });
+  el('circle', { cx: 749, cy: 57, r: 2.4, fill: ink });
+  el('path', { d: 'M734 68 Q742 77 751 68', fill: 'none', stroke: C('red'), 'stroke-width': 3, 'stroke-linecap': 'round' });
+
+  /* pizarrón */
+  scribble(function () { return [478, 768]; }, 252, 438, 6, C('board'), 7);
+  shape([[480, 250], [766, 250], [766, 440], [480, 440]], { stroke: C('wood'), 'stroke-width': 10 });
+  line([[470, 450], [775, 450]], { stroke: C('wood'), 'stroke-width': 8 });
+  line([[520, 454], [512, 564]], { stroke: C('wood'), 'stroke-width': 7 });
+  line([[730, 454], [738, 564]], { stroke: C('wood'), 'stroke-width': 7 });
+  var chalk = el('text', { x: 622, y: 335, 'text-anchor': 'middle', 'font-size': 58, fill: C('chalk') });
+  chalk.textContent = '2+2=4';
+  el('path', { d: 'M560 392 C548 378 566 366 570 380 C576 366 594 378 580 392 L570 404 Z', fill: 'none', stroke: C('chalk'), 'stroke-width': 3, 'stroke-linejoin': 'round' });
+  poly([[690, 372], [696, 392], [714, 392], [700, 403], [705, 421], [690, 410], [675, 421], [680, 403], [666, 392], [684, 392], [690, 372]], { stroke: C('chalk'), 'stroke-width': 3, 'stroke-linejoin': 'round' });
+
+  /* la maestra: pelo */
+  scribble(circExt(250, 292, 64), 228, 356, 7, C('hair'), 9);
+  scribble(function () { return [184, 204]; }, 300, 386, 7, C('hair'), 9);
+  scribble(function () { return [296, 316]; }, 300, 386, 7, C('hair'), 9);
+
+  /* vestido */
+  scribble(function (y) { var t = (y - 372) / 173; return [215 - 55 * t, 285 + 55 * t]; }, 372, 545, 7, C('purple'), 9);
+  shape([[215, 372], [160, 545], [340, 545], [285, 372]], { stroke: ink, 'stroke-width': 4 });
+  [[205, 480], [295, 480], [228, 515], [272, 515]].forEach(function (p) {
+    circ(p[0], p[1], 5, { stroke: C('yellow'), 'stroke-width': 4 });
+  });
+
+  /* medalla de la mejor maestra */
+  line([[228, 374], [250, 412]], { stroke: C('red'), 'stroke-width': 4 });
+  line([[272, 374], [250, 412]], { stroke: C('red'), 'stroke-width': 4 });
+  el('circle', { cx: 250, cy: 432, r: 20, fill: C('gold') });
+  circ(250, 432, 20, { stroke: C('orange'), 'stroke-width': 4 });
+  var uno = el('text', { x: 250, y: 442, 'text-anchor': 'middle', 'font-size': 28, fill: ink });
+  uno.textContent = '1';
+
+  /* brazos, manzana, puntero */
+  line([[218, 392], [190, 380], [160, 362]], { stroke: ink, 'stroke-width': 6 });
+  line([[282, 392], [360, 350], [422, 330]], { stroke: ink, 'stroke-width': 6 });
+  el('circle', { cx: 148, cy: 336, r: 20, fill: C('red') });
+  circ(148, 336, 20, { stroke: C('red-dark'), 'stroke-width': 4 });
+  line([[148, 316], [151, 305]], { stroke: C('hair'), 'stroke-width': 4 });
+  el('ellipse', { cx: 160, cy: 308, rx: 9, ry: 5, fill: C('green'), transform: 'rotate(-25 160 308)' });
+  line([[424, 329], [480, 305]], { stroke: C('wood'), 'stroke-width': 5 });
+  el('circle', { cx: 160, cy: 360, r: 9, fill: C('skin') });
+  circ(160, 360, 9, { stroke: ink, 'stroke-width': 3 });
+  el('circle', { cx: 424, cy: 329, r: 9, fill: C('skin') });
+  circ(424, 329, 9, { stroke: ink, 'stroke-width': 3 });
+
+  /* piernas y zapatos */
+  line([[228, 545], [226, 588]], { stroke: ink, 'stroke-width': 5 });
+  line([[272, 545], [274, 588]], { stroke: ink, 'stroke-width': 5 });
+  el('ellipse', { cx: 214, cy: 596, rx: 20, ry: 9, fill: ink });
+  el('ellipse', { cx: 288, cy: 596, rx: 20, ry: 9, fill: ink });
+
+  /* cuello y cara */
+  line([[243, 346], [243, 372]], { stroke: ink, 'stroke-width': 4 });
+  line([[257, 346], [257, 372]], { stroke: ink, 'stroke-width': 4 });
+  el('circle', { cx: 250, cy: 300, r: 50, fill: C('skin') });
+  circ(250, 300, 50, { stroke: ink, 'stroke-width': 4 });
+  scribble(circExt(214, 320, 9), 311, 329, 4, C('pink'), 4);
+  scribble(circExt(286, 320, 9), 311, 329, 4, C('pink'), 4);
+  circ(232, 296, 13, { stroke: ink, 'stroke-width': 3 });
+  circ(268, 296, 13, { stroke: ink, 'stroke-width': 3 });
+  line([[245, 296], [255, 296]], { stroke: ink, 'stroke-width': 3 });
+  el('circle', { cx: 232, cy: 297, r: 4, fill: ink });
+  el('circle', { cx: 268, cy: 297, r: 4, fill: ink });
+  line([[250, 304], [247, 314], [253, 315]], { stroke: ink, 'stroke-width': 3 });
+  el('path', { d: 'M224 324 Q250 352 276 324', fill: 'none', stroke: C('red'), 'stroke-width': 5, 'stroke-linecap': 'round' });
+
+  /* corazones */
+  heart(355, 255, 20, C('red'), C('red-dark'));
+  heart(62, 335, 16, C('pink'), C('red'));
+  heart(105, 465, 14, C('red'), C('red-dark'));
+  heart(395, 470, 16, C('pink'), C('red'));
+  heart(430, 540, 22, C('red'), C('red-dark'));
+  heart(120, 400, 12, C('pink'), C('red'));
+
+  /* flores */
+  flower(50, 600, C('red'));
+  flower(120, 612, C('purple'));
+  flower(400, 602, C('orange'));
+  flower(460, 614, C('pink'));
+  flower(620, 606, C('blue'));
+  flower(700, 596, C('red'));
+  flower(762, 612, C('purple'));
+
+  /* letrero */
+  var cols = [C('red'), C('orange'), C('green'), C('blue'), C('purple'), C('pink')];
+  var ci = 0;
+  function titleLine(text, y, min, max) {
+    var t = el('text', { x: 400, y: y, 'text-anchor': 'middle', 'letter-spacing': 1 });
+    var off = 0;
+    text.split(' ').forEach(function (w, wi) {
+      Array.prototype.forEach.call(w, function (ch, k) {
+        var ts = document.createElementNS(NS, 'tspan');
+        var o = r(-7, 7);
+        ts.setAttribute('dy', (o - off).toFixed(1)); off = o;
+        if (wi > 0 && k === 0) ts.setAttribute('dx', '24');
+        ts.setAttribute('rotate', r(-9, 9).toFixed(1));
+        ts.setAttribute('font-size', Math.round(r(min, max)));
+        ts.setAttribute('fill', cols[ci++ % cols.length]);
+        ts.textContent = ch;
+        t.appendChild(ts);
+      });
+    });
+  }
+  titleLine('LA MEJOR MAESTRA', 88, 52, 64);
+  titleLine('DEL MUNDO', 170, 62, 76);
+
+  var sq = [];
+  for (var sx = 250; sx <= 550; sx += 12) sq.push([sx, 196 + ((sx / 12) % 2 ? -6 : 6)]);
+  poly(sq, { stroke: C('red'), 'stroke-width': 5 });
+
+  star(65, 75, 17);
+  star(735, 140, 14);
+  star(95, 165, 15);
+})();
+</script>
+
+</body></html>
